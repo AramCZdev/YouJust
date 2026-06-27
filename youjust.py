@@ -12,6 +12,19 @@ if not args:
     print("Usage: youjust <command>")
     sys.exit(0)
 
+cmd = " ".join(args)
+
+def norm(text):
+    return text.lower()
+
+def starts(prefix):
+    return cmd.lower().startswith(prefix)
+
+def after(prefix):
+    if starts(prefix):
+        return cmd[len(prefix):].strip()
+    return None
+
 # ---------------------------
 # Sentence parsing system
 # ---------------------------
@@ -139,8 +152,9 @@ elif cmd.startswith("rename"):
 # Navigation
 # ---------------------------
 
-elif cmd.startswith("go into"):
+elif starts("go into"):
     path = after("go into")
+
     if not path:
         print("Usage: youjust go into <dir>")
     else:
