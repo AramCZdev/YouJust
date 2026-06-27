@@ -15,9 +15,7 @@ YouJust is a simple command-line tool that translates natural sentence-style com
 
 ## Installation
 
-### Prerequesities
-
-Debian, Ubuntu, Mint etc.
+YouJust is available on Ubuntu, Debian, Mint or Debian-based distros
 
 ### From .deb package
 
