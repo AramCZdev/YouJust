@@ -1,2 +1,2 @@
 # YouJust
-Beginner-friendly CLI wrapper for Debian-based Linux commands
+A simple command-line tool that translates beginner-friendly commands into Linux terminal commands
