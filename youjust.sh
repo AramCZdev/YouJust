@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# only load in interactive shells
+if [[ $- != *i* ]]; then
+    return
+fi
+
 _youjust_completion() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
 
@@ -22,11 +27,9 @@ _youjust_completion() {
 
 youjust() {
     local output
-
-    output=$(command youjust.py "$@")
+    output=$(youjust "$@")   # IMPORTANT: use installed binary
     output=$(echo "$output" | xargs)
 
-    # If Python asks for a directory change
     if [[ "$output" == cd\ * ]]; then
         builtin cd "${output:3}"
         return

@@ -37,7 +37,13 @@ EOF
 # Main program
 # ---------------------------
 
-install -m755 youjust.py build/$APP/usr/bin/youjust
+install -Dm755 youjust.py build/$APP/usr/bin/youjust
+
+# ---------------------------
+# Shell integration
+# ---------------------------
+
+install -Dm644 youjust.sh build/$APP/etc/profile.d/youjust.sh
 
 # ---------------------------
 # Bash completion (shell integration)
