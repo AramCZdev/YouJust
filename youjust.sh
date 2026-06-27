@@ -22,17 +22,17 @@ _youjust_completion() {
 
 youjust() {
     local output
-    output=$(command youjust.py "$@")
 
-    # trim whitespace
+    output=$(command youjust.py "$@")
     output=$(echo "$output" | xargs)
 
-    # execute cd if returned
-    if [[ "$output" == cd* ]]; then
-        cd "${output#cd }"
-    else
-        echo "$output"
+    # If Python asks for a directory change
+    if [[ "$output" == cd\ * ]]; then
+        builtin cd "${output:3}"
+        return
     fi
+
+    echo "$output"
 }
 
 complete -F _youjust_completion youjust
