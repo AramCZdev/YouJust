@@ -3,7 +3,10 @@ name: Build and Release YouJust
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
