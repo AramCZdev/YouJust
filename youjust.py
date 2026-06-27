@@ -12,11 +12,19 @@ if not args:
     print("Usage: youjust <command>")
     sys.exit(0)
 
-cmd = args[0].lower()
+# ---------------------------
+# Sentence parsing
+# ---------------------------
+
+# turn: ["see", "ip"] -> cmd = "see ip"
+cmd = " ".join(args).lower()
+
+# split helper for arguments after keyword
+rest = args[1:] if len(args) > 1 else []
 
 
 # ---------------------------
-# Package management (APT)
+# Commands
 # ---------------------------
 
 if cmd == "install":
@@ -41,7 +49,7 @@ elif cmd == "upgrade":
 
 
 # ---------------------------
-# File operations
+# File ops
 # ---------------------------
 
 elif cmd == "createfile":
@@ -72,7 +80,27 @@ elif cmd == "delete":
 
 
 # ---------------------------
-# Navigation (limited)
+# System (sentence style)
+# ---------------------------
+
+elif cmd == "showsystem":
+    run(["bash", "-c", "fastfetch || neofetch || uname -a"])
+
+elif cmd == "see ip":
+    run(["ip", "addr"])
+
+elif cmd == "see processes":
+    run(["ps", "aux"])
+
+elif cmd == "see space":
+    run(["df", "-h"])
+
+elif cmd == "see whereami":
+    run(["pwd"])
+
+
+# ---------------------------
+# Navigation
 # ---------------------------
 
 elif cmd == "gointo":
@@ -81,12 +109,39 @@ elif cmd == "gointo":
     else:
         print(f"cd {args[1]}")
 
+
 # ---------------------------
-# Fastfetch or Neofetch
+# Networking
 # ---------------------------
 
-elif cmd == "showsystem":
-    run(["bash", "-c", "fastfetch || neofetch || uname -a"])
+elif cmd == "ping":
+    if len(args) < 2:
+        print("Usage: youjust ping <host>")
+    else:
+        run(["ping", "-c", "4", args[1]])
+
+
+# ---------------------------
+# Process kill
+# ---------------------------
+
+elif cmd == "kill":
+    if len(args) < 2:
+        print("Usage: youjust kill <PID>")
+    else:
+        run(["kill", args[1]])
+
+
+# ---------------------------
+# Disk usage
+# ---------------------------
+
+elif cmd == "folderusage":
+    if len(args) < 2:
+        run(["du", "-sh", "."])
+    else:
+        run(["du", "-sh", args[1]])
+
 
 # ---------------------------
 # File viewing
@@ -100,6 +155,7 @@ elif cmd == "showfile":
 
 elif cmd == "list":
     run(["ls", "-lah"])
+
 
 # ---------------------------
 # Copy / Move
@@ -123,71 +179,17 @@ elif cmd == "rename":
     else:
         run(["mv", args[1], args[2]])
 
-# ---------------------------
-# Networking
-# ---------------------------
-
-elif cmd == "ip":
-    run(["ip", "addr"])
-
-elif cmd == "ping":
-    if len(args) < 2:
-        print("Usage: youjust ping <host>")
-    else:
-        run(["ping", "-c", "4", args[1]])
 
 # ---------------------------
-# Process management
-# ---------------------------
-
-elif cmd == "processes":
-    run(["ps", "aux"])
-
-elif cmd == "kill":
-    if len(args) < 2:
-        print("Usage: youjust kill <PID>")
-    else:
-        run(["kill", args[1]])
-
-# ---------------------------
-# Disk usage
-# ---------------------------
-
-elif cmd == "space":
-    run(["df", "-h"])
-
-elif cmd == "folderusage":
-    if len(args) < 2:
-        run(["du", "-sh", "."])
-    else:
-        run(["du", "-sh", args[1]])
-
-# ---------------------------
-# Searching
-# ---------------------------
-
-elif cmd == "find":
-    if len(args) < 2:
-        print("Usage: youjust find <filename>")
-    else:
-        run(["find", ".", "-name", args[1]])
-
-# ---------------------------
-# Current directory
-# ---------------------------
-
-elif cmd == "whereami":
-    run(["pwd"])
-
-# ---------------------------
-# Clear terminal
+# Terminal
 # ---------------------------
 
 elif cmd == "clear":
     run(["clear"])
 
+
 # ---------------------------
-# Reboot / Shutdown
+# Power
 # ---------------------------
 
 elif cmd == "reboot":
@@ -200,56 +202,133 @@ elif cmd == "shutdown":
     if confirm.lower() == "y":
         run(["sudo", "shutdown", "now"])
 
+
 # ---------------------------
 # Help
 # ---------------------------
 
-elif cmd == "help":
+elif cmd in ("help", "gethelp"):
     print("""
-YouJust - Beginner CLI wrapper for Debian
+YouJust - Beginner-friendly Linux command tool
 
-Package management:
-  install <pkg>         Install package via apt
-  remove <pkg>          Remove package via apt
-  update                Update package list
-  upgrade               Upgrade installed packages
+This tool lets you use simple sentence-style commands instead of complex Linux syntax.
 
-System:
-  showsystem            Show system information
-  processes             List running processes
-  kill <PID>            Kill a process
-  reboot                Reboot the computer
-  shutdown              Shut down the computer
+The idea is:
+  youjust <action> <thing>
 
-Files & folders:
-  createfile <name>     Create an empty file
-  createfolder <name>   Create a folder
-  showfile <file>       Display a file
-  copy <src> <dst>      Copy a file or folder
-  move <src> <dst>      Move a file or folder
-  rename <old> <new>    Rename a file or folder
-  delete <path>         Delete a file or folder
-  makeexec <file>       Make a file executable
-  list                  List files in the current directory
-  find <name>           Find a file
+Example:
+  youjust install htop
+  (installs a program without needing apt commands)
 
-Navigation:
-  gointo <dir>          Print the cd command
-  whereami              Show current directory
+----------------------------
+PACKAGE MANAGEMENT
+----------------------------
 
-Networking:
-  ip                    Show IP/network information
-  ping <host>           Ping a host
+install <package>
+  Installs a program using the system package manager (APT).
+  Example: youjust install git
 
-Disk:
-  space                 Show disk usage
-  folderusage [dir]     Show folder size
+remove <package>
+  Removes a program from your system.
+  Example: youjust remove nano
 
-Terminal:
-  clear                 Clear the terminal
+update
+  Refreshes the list of available packages.
+  Example: youjust update
 
-Other:
-  help                  Show this help
+upgrade
+  Updates all installed programs to their latest versions.
+  Example: youjust upgrade
+
+
+----------------------------
+SYSTEM INFORMATION
+----------------------------
+
+showsystem
+  Displays basic system info (uses fastfetch, neofetch, or uname).
+
+see ip
+  Shows your network IP addresses.
+
+see processes
+  Lists all running programs.
+
+see space
+  Shows how much disk space is used.
+
+see whereami
+  Shows your current folder location.
+
+
+----------------------------
+FILES & FOLDERS
+----------------------------
+
+createfile <name>
+  Creates a new empty file.
+
+createfolder <name>
+  Creates a new folder (directory).
+
+showfile <file>
+  Displays the contents of a file.
+
+list
+  Shows all files in the current folder.
+
+copy <source> <destination>
+  Copies files or folders.
+
+move <source> <destination>
+  Moves files or folders.
+
+rename <old> <new>
+  Renames a file or folder.
+
+delete <file/folder>
+  Deletes a file or folder (asks for confirmation first).
+
+
+----------------------------
+NAVIGATION
+----------------------------
+
+gointo <dir>
+  Shows the command needed to enter a folder (cd <dir>).
+
+
+----------------------------
+NETWORKING
+----------------------------
+
+ping <host>
+  Checks if a website or server is reachable.
+
+
+----------------------------
+POWER COMMANDS
+----------------------------
+
+reboot
+  Restarts your computer (asks for confirmation).
+
+shutdown
+  Turns off your computer (asks for confirmation).
+
+
+----------------------------
+TERMINAL
+----------------------------
+
+clear
+  Clears the terminal screen.
+
+----------------------------
+
+Tip:
+  This tool is designed to help beginners learn Linux commands by using simpler language first.
+  Over time, you will naturally start recognizing the real Linux commands underneath.
 """)
 
 else:
