@@ -1,0 +1,27 @@
+name: Build YouJust (.deb)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dpkg tools
+        run: sudo apt-get update && sudo apt-get install -y dpkg-dev
+
+      - name: Make build script executable
+        run: chmod +x build.sh
+
+      - name: Build package
+        run: ./build.sh
+
+      - name: Upload .deb artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: youjust-deb
+          path: "*.deb"
