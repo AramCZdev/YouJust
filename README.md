@@ -2,7 +2,7 @@
 
 A simple command-line tool that translates beginner-friendly commands into Linux terminal commands.
 
-YouJust is a lightweight wrapper around common Linux commands designed to make the terminal more approachable for beginners. Instead of memorizing complex syntax, users can run simple commands like `youjust install`, `youjust delete`, and more.
+YouJust is a simple command-line tool that translates natural sentence-style commands into Linux terminal commands, making the terminal easier to understand for beginners.
 
 ## Features
 
