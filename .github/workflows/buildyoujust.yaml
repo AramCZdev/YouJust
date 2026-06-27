@@ -1,7 +1,9 @@
-name: Build YouJust (.deb)
+name: Build and Release YouJust
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -11,17 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dpkg tools
+      - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y dpkg-dev
 
-      - name: Make build script executable
-        run: chmod +x build_deb.sh
-
       - name: Build package
-        run: ./build_deb.sh
+        run: chmod +x build.sh && ./build.sh
 
-      - name: Upload .deb artifact
-        uses: actions/upload-artifact@v4
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: youjust-deb
-          path: "*.deb"
+          tag_name: ${{ github.ref_name }}
+          name: YouJust ${{ github.ref_name }}
+          files: "*.deb"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

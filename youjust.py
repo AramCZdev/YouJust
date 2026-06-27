@@ -104,10 +104,11 @@ elif cmd == "see whereami":
 # ---------------------------
 
 elif cmd == "gointo":
-    if len(args) < 2:
+    path = " ".join(args[1:])
+    if not path:
         print("Usage: youjust gointo <dir>")
     else:
-        print(f"cd {args[1]}")
+        print(f"cd {path}")
 
 
 # ---------------------------
