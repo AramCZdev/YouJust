@@ -11,15 +11,14 @@ rm -rf build
 # ---------------------------
 # Directory structure
 # ---------------------------
-
 mkdir -p build/$APP/DEBIAN
 mkdir -p build/$APP/usr/bin
+mkdir -p build/$APP/etc/profile.d
 mkdir -p build/$APP/usr/share/bash-completion/completions
 
 # ---------------------------
 # Control file
 # ---------------------------
-
 cat > build/$APP/DEBIAN/control <<EOF
 Package: $APP
 Version: $VERSION
@@ -28,43 +27,45 @@ Priority: optional
 Architecture: $ARCH
 Maintainer: AramCZ
 Homepage: https://aramczdev.github.io
-Description: Beginner-friendly Linux command wrapper
- A simple CLI tool that translates beginner-friendly sentence-style commands
- into Linux terminal commands.
+Description: Sentence-style Linux command wrapper
+ A CLI tool that translates sentence-style commands into Linux terminal actions.
 EOF
 
 # ---------------------------
 # Main program
 # ---------------------------
-
 install -Dm755 youjust.py build/$APP/usr/bin/youjust
 
 # ---------------------------
 # Shell integration
 # ---------------------------
-
 install -Dm644 youjust.sh build/$APP/etc/profile.d/youjust.sh
 
 # ---------------------------
-# Bash completion (shell integration)
+# Bash completion (FIXED to match sentence commands)
 # ---------------------------
-
 cat > build/$APP/usr/share/bash-completion/completions/youjust <<'EOF'
 _youjust_completion() {
     local cur="${COMP_WORDS[1]}"
 
     COMPREPLY=($(compgen -W "
         install remove update upgrade
-        createfile createfolder delete
-        showfile list
+        show system info
+        show ip
+        show processes
+        show space
+        show current directory
+        create file
+        create folder
+        show file
+        list files
         copy move rename
-        showsystem
-        see ip
-        see processes
-        see space
-        see whereami
-        help gethelp
-        clear reboot shutdown
+        go into
+        ping
+        kill
+        clear screen
+        reboot shutdown
+        help get help
     " -- "$cur"))
 }
 
@@ -74,7 +75,6 @@ EOF
 # ---------------------------
 # Build package
 # ---------------------------
-
 dpkg-deb --build build/$APP "${APP}_${VERSION}_${ARCH}.deb"
 
 echo "Built ${APP}_${VERSION}_${ARCH}.deb"

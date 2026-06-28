@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 import subprocess
+import shlex
+import re
 
 def run(cmd):
     print(f"> {' '.join(cmd)}")
@@ -12,49 +14,38 @@ if not args:
     print("Usage: youjust <command>")
     sys.exit(0)
 
-cmd = " ".join(args)
-
-def norm(text):
-    return text.lower()
-
-def starts(prefix):
-    return cmd.lower().startswith(prefix)
-
-def after(prefix):
-    if starts(prefix):
-        return cmd[len(prefix):].strip()
-    return None
-
 # ---------------------------
-# Sentence parsing system
+# Normalize input (fix spacing)
 # ---------------------------
+raw_cmd = " ".join(args)
+raw_cmd = re.sub(r"\s+", " ", raw_cmd).strip()
+cmd = raw_cmd.lower()
 
-cmd = " ".join(args).lower()
+def starts(x):
+    return cmd.startswith(x)
 
-def after(prefix):
-    if cmd.startswith(prefix):
-        return cmd[len(prefix):].strip()
+def after(x):
+    if starts(x):
+        return raw_cmd[len(x):].strip()
     return None
 
 
 # ---------------------------
-# Package management
+# PACKAGE MANAGEMENT
 # ---------------------------
-
-if cmd.startswith("install"):
+if starts("install"):
     pkg = after("install")
     if not pkg:
         print("Usage: youjust install <package>")
     else:
         run(["sudo", "apt", "install", "-y", pkg])
 
-elif cmd.startswith("remove"):
+elif starts("remove"):
     pkg = after("remove")
     if not pkg:
         print("Usage: youjust remove <package>")
     else:
-        confirm = input(f"Remove {pkg}? [y/N]: ")
-        if confirm.lower() == "y":
+        if input(f"Remove {pkg}? [y/N]: ").lower() == "y":
             run(["sudo", "apt", "remove", "-y", pkg])
 
 elif cmd == "update":
@@ -65,83 +56,79 @@ elif cmd == "upgrade":
 
 
 # ---------------------------
-# System info
+# SYSTEM INFO
 # ---------------------------
-
-elif cmd == "showsystem":
+elif cmd == "show system info":
     run(["bash", "-c", "fastfetch || neofetch || uname -a"])
 
-elif cmd.startswith("see ip"):
+elif cmd == "show ip":
     run(["ip", "addr"])
 
-elif cmd.startswith("see processes"):
+elif cmd == "show processes":
     run(["ps", "aux"])
 
-elif cmd.startswith("see space"):
+elif cmd == "show space":
     run(["df", "-h"])
 
-elif cmd.startswith("see whereami"):
+elif cmd == "show current directory":
     run(["pwd"])
 
 
 # ---------------------------
-# Files & folders
+# FILES & FOLDERS
 # ---------------------------
-
-elif cmd.startswith("create file"):
+elif starts("create file"):
     name = after("create file")
     if not name:
         print("Usage: youjust create file <name>")
     else:
         run(["touch", name])
 
-elif cmd.startswith("create folder"):
+elif starts("create folder"):
     name = after("create folder")
     if not name:
         print("Usage: youjust create folder <name>")
     else:
         run(["mkdir", "-p", name])
 
-elif cmd.startswith("delete"):
+elif starts("delete"):
     target = after("delete")
     if not target:
         print("Usage: youjust delete <file|folder>")
     else:
-        confirm = input(f"Delete {target}? [y/N]: ")
-        if confirm.lower() == "y":
+        if input(f"Delete {target}? [y/N]: ").lower() == "y":
             run(["rm", "-rf", target])
 
-elif cmd.startswith("show file"):
+elif starts("show file"):
     file = after("show file")
     if not file:
         print("Usage: youjust show file <file>")
     else:
         run(["cat", file])
 
-elif cmd == "list":
+elif cmd == "list files":
     run(["ls", "-lah"])
 
 
 # ---------------------------
-# Copy / Move / Rename
+# COPY / MOVE / RENAME
 # ---------------------------
-
-elif cmd.startswith("copy"):
-    parts = cmd.split()
+elif starts("copy"):
+    parts = shlex.split(raw_cmd)
     if len(parts) < 3:
         print("Usage: youjust copy <source> <destination>")
     else:
         run(["cp", "-r", parts[1], parts[2]])
 
-elif cmd.startswith("move"):
-    parts = cmd.split()
+elif starts("move"):
+    parts = shlex.split(raw_cmd)
     if len(parts) < 3:
         print("Usage: youjust move <source> <destination>")
     else:
         run(["mv", parts[1], parts[2]])
 
-elif cmd.startswith("rename"):
-    parts = cmd.split()
+elif starts("rename"):
+    parts = shlex.split(raw_cmd)
     if len(parts) < 3:
         print("Usage: youjust rename <old> <new>")
     else:
@@ -149,23 +136,20 @@ elif cmd.startswith("rename"):
 
 
 # ---------------------------
-# Navigation
+# NAVIGATION (shell wrapper handles actual cd)
 # ---------------------------
-
 elif starts("go into"):
     path = after("go into")
-
     if not path:
-        print("Usage: youjust go into <dir>")
+        print("Usage: youjust go into <directory>")
     else:
-        print(f"cd {path}")
+        print(f"cd {shlex.quote(path)}")
 
 
 # ---------------------------
-# Networking
+# NETWORKING
 # ---------------------------
-
-elif cmd.startswith("ping"):
+elif starts("ping"):
     host = after("ping")
     if not host:
         print("Usage: youjust ping <host>")
@@ -174,10 +158,9 @@ elif cmd.startswith("ping"):
 
 
 # ---------------------------
-# Processes
+# PROCESSES
 # ---------------------------
-
-elif cmd.startswith("kill"):
+elif starts("kill"):
     pid = after("kill")
     if not pid:
         print("Usage: youjust kill <PID>")
@@ -186,79 +169,94 @@ elif cmd.startswith("kill"):
 
 
 # ---------------------------
-# Terminal
+# TERMINAL
 # ---------------------------
-
-elif cmd == "clear":
+elif cmd == "clear screen":
     run(["clear"])
 
 
 # ---------------------------
-# Power
+# POWER
 # ---------------------------
-
 elif cmd == "reboot":
-    confirm = input("Reboot computer? [y/N]: ")
-    if confirm.lower() == "y":
+    if input("Reboot computer? [y/N]: ").lower() == "y":
         run(["sudo", "reboot"])
 
 elif cmd == "shutdown":
-    confirm = input("Shutdown computer? [y/N]: ")
-    if confirm.lower() == "y":
+    if input("Shutdown computer? [y/N]: ").lower() == "y":
         run(["sudo", "shutdown", "now"])
 
 
 # ---------------------------
-# Help
+# HELP
 # ---------------------------
-
-elif cmd in ("help", "gethelp"):
+elif cmd in ("help", "get help"):
     print("""
 YouJust - Sentence-style Linux command tool
 
-You can write commands like natural language:
+COMMAND STYLE (IMPORTANT)
+Everything is written as simple sentences:
 
   youjust install git
   youjust remove nano
-  youjust see ip
+  youjust show system info
+  youjust show ip
+  youjust show current directory
   youjust go into Documents
   youjust create file test.txt
+  youjust create folder projects
+  youjust show file notes.txt
+  youjust list files
+  youjust delete test.txt
+  youjust copy a.txt b.txt
+  youjust move a.txt folder/
+  youjust rename old.txt new.txt
+  youjust ping aramczdev.github.io
+  youjust kill 1234
+  youjust clear screen
+  youjust reboot
+  youjust shutdown
 
 ----------------------------
 PACKAGE MANAGEMENT
 ----------------------------
-install <package>        Install a program
-remove <package>         Remove a program
-update                   Refresh package list
-upgrade                  Upgrade all packages
+install <package>        Install a package
+remove <package>         Remove a package
+update                   Update package lists
+upgrade                  Upgrade system packages
 
 ----------------------------
-SYSTEM
+SYSTEM INFO
 ----------------------------
-showsystem               Show system info
-see ip                   Show network info
-see processes            List running processes
-see space                Show disk usage
-see whereami             Show current directory
+show system info         System information
+show ip                  Network info
+show processes           Running processes
+show space               Disk usage
+show current directory   Current path
 
 ----------------------------
 FILES
 ----------------------------
-create file <name>      Create a file
-create folder <name>    Create a folder
-show file <file>       Display file contents
-list                    List directory contents
+create file <name>      Create file
+create folder <name>    Create folder
+show file <file>        Display file contents
+list files              List directory contents
 delete <target>        Delete file or folder
 
 ----------------------------
 NAVIGATION
 ----------------------------
-go into <dir>          Show cd command
+go into <dir>          Change directory (handled via shell wrapper)
 
 ----------------------------
 NETWORK
 ----------------------------
-ping <host>            Ping a server
+ping <host>            Ping a host
+
+----------------------------
+PROCESS
+----------------------------
+kill <pid>             Kill process
 
 ----------------------------
 POWER
@@ -269,7 +267,7 @@ shutdown               Turn off system
 ----------------------------
 TERMINAL
 ----------------------------
-clear                  Clear screen
+clear screen           Clear terminal
 """)
 
 else:
