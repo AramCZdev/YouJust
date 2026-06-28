@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import subprocess
 import shlex
@@ -143,7 +144,11 @@ elif starts("go into"):
     if not path:
         print("Usage: youjust go into <directory>")
     else:
-        print(f"cd {shlex.quote(path)}")
+        try:
+            os.chdir(path)
+            print(f"now in {os.getcwd()}")
+        except FileNotFoundError:
+            print(f"No such directory: {path}")
 
 
 # ---------------------------

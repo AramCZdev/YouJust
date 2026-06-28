@@ -13,7 +13,6 @@ rm -rf build
 # ---------------------------
 mkdir -p build/$APP/DEBIAN
 mkdir -p build/$APP/usr/bin
-mkdir -p build/$APP/etc/profile.d
 mkdir -p build/$APP/usr/share/bash-completion/completions
 
 # ---------------------------
@@ -27,7 +26,7 @@ Priority: optional
 Architecture: $ARCH
 Maintainer: AramCZ
 Homepage: https://aramczdev.github.io
-Description: Sentence-style Linux command wrapper
+Description: Sentence-style Linux command tool
  A CLI tool that translates sentence-style commands into Linux terminal actions.
 EOF
 
@@ -37,12 +36,7 @@ EOF
 install -Dm755 youjust.py build/$APP/usr/bin/youjust
 
 # ---------------------------
-# Shell integration
-# ---------------------------
-install -Dm644 youjust.sh build/$APP/etc/profile.d/youjust.sh
-
-# ---------------------------
-# Bash completion (FIXED to match sentence commands)
+# Bash completion (updated to match Python commands)
 # ---------------------------
 cat > build/$APP/usr/share/bash-completion/completions/youjust <<'EOF'
 _youjust_completion() {
