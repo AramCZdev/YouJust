@@ -3,7 +3,6 @@ import os
 import sys
 import subprocess
 import shlex
-import re
 
 def run(cmd):
     print(f"> {' '.join(cmd)}")
@@ -16,10 +15,9 @@ if not args:
     sys.exit(0)
 
 # ---------------------------
-# Normalize input (fix spacing)
+# Preserve the original command text for exact path handling.
 # ---------------------------
-raw_cmd = " ".join(args)
-raw_cmd = re.sub(r"\s+", " ", raw_cmd).strip()
+raw_cmd = " ".join(args).strip()
 cmd = raw_cmd.lower()
 
 def starts(x):
@@ -142,13 +140,9 @@ elif starts("rename"):
 elif starts("go into"):
     path = after("go into")
     if not path:
-        print("Usage: youjust go into <directory>")
+        print("Usage: youjust go into <dir>")
     else:
-        try:
-            os.chdir(path)
-            print(f"now in {os.getcwd()}")
-        except FileNotFoundError:
-            print(f"No such directory: {path}")
+        print(f"cd {path}")
 
 
 # ---------------------------

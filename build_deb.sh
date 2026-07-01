@@ -13,6 +13,7 @@ rm -rf build
 # ---------------------------
 mkdir -p build/$APP/DEBIAN
 mkdir -p build/$APP/usr/bin
+mkdir -p build/$APP/usr/share/youjust
 mkdir -p build/$APP/usr/share/bash-completion/completions
 
 # ---------------------------
@@ -25,22 +26,41 @@ Section: utils
 Priority: optional
 Architecture: $ARCH
 Maintainer: AramCZ
-Homepage: https://aramczdev.github.io
 Description: Sentence-style Linux command tool
- A CLI tool that translates sentence-style commands into Linux terminal actions.
 EOF
 
 # ---------------------------
-# Main program
+# Install main program
 # ---------------------------
 install -Dm755 youjust.py build/$APP/usr/bin/youjust
 
 # ---------------------------
-# Bash completion (updated to match Python commands)
+# Install shell wrapper (REQUIRED for cd)
+# ---------------------------
+install -Dm644 youjust.sh build/$APP/usr/share/youjust/youjust.sh
+
+# ---------------------------
+# Enable wrapper automatically in bash
+# ---------------------------
+cat > build/$APP/DEBIAN/postinst <<'EOF'
+#!/bin/bash
+set -e
+
+SOURCE_LINE="source /usr/share/youjust/youjust.sh"
+
+if ! grep -q "youjust.sh" /etc/bash.bashrc; then
+    echo "$SOURCE_LINE" >> /etc/bash.bashrc
+fi
+EOF
+
+chmod 755 build/$APP/DEBIAN/postinst
+
+# ---------------------------
+# Bash completion (UNCHANGED LOGIC)
 # ---------------------------
 cat > build/$APP/usr/share/bash-completion/completions/youjust <<'EOF'
 _youjust_completion() {
-    local cur="${COMP_WORDS[1]}"
+    local cur="${COMP_WORDS[COMP_CWORD]}"
 
     COMPREPLY=($(compgen -W "
         install remove update upgrade
