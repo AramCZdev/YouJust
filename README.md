@@ -22,9 +22,9 @@ YouJust is available on Ubuntu, Debian, Mint or Debian-based distros
 Download the latest `.deb` release and install it:
 
 ```bash
-sudo dpkg install (path to your .deb)
+sudo apt install (path to your .deb)
 ```
-If you do not have Python 3 install it via this command
+Python 3 shiuld´
 ```bash
 sudo apt install python3
 ```
