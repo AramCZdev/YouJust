@@ -24,7 +24,7 @@ Download the latest `.deb` release and install it:
 ```bash
 sudo apt install (path to your .deb)
 ```
-Python 3 shiuld´
+Python 3 should be installed but if not install it like this:
 ```bash
 sudo apt install python3
 ```
