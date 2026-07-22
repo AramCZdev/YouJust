@@ -3,7 +3,7 @@
 set -e
 
 APP="youjust"
-VERSION="1.0"
+VERSION="1.0.0"
 ARCH="all"
 
 rm -rf build
@@ -25,7 +25,7 @@ Version: $VERSION
 Section: utils
 Priority: optional
 Architecture: $ARCH
-Maintainer: AramCZ
+Maintainer: AramCZ <aramcz@protonmail.com>
 Description: Sentence-style Linux command tool
 EOF
 
@@ -35,28 +35,7 @@ EOF
 install -Dm755 youjust.py build/$APP/usr/bin/youjust
 
 # ---------------------------
-# Install shell wrapper (REQUIRED for cd)
-# ---------------------------
-install -Dm644 youjust.sh build/$APP/usr/share/youjust/youjust.sh
-
-# ---------------------------
-# Enable wrapper automatically in bash
-# ---------------------------
-cat > build/$APP/DEBIAN/postinst <<'EOF'
-#!/bin/bash
-set -e
-
-SOURCE_LINE="source /usr/share/youjust/youjust.sh"
-
-if ! grep -q "youjust.sh" /etc/bash.bashrc; then
-    echo "$SOURCE_LINE" >> /etc/bash.bashrc
-fi
-EOF
-
-chmod 755 build/$APP/DEBIAN/postinst
-
-# ---------------------------
-# Bash completion (UNCHANGED LOGIC)
+# Bash completion
 # ---------------------------
 cat > build/$APP/usr/share/bash-completion/completions/youjust <<'EOF'
 _youjust_completion() {
@@ -85,6 +64,36 @@ _youjust_completion() {
 
 complete -F _youjust_completion youjust
 EOF
+
+# ---------------------------
+# Wrapper script for changing directories
+# ---------------------------
+cat > build/$APP/usr/share/youjust/wrapper.sh <<'EOF'
+youjust() {
+    local output
+    output=$(command youjust "$@")
+
+    if [[ "$output" == YOUJUST_CD:* ]]; then
+        cd "${output#YOUJUST_CD:}"
+    else
+        echo "$output"
+    fi
+}
+EOF
+
+# Create a postinst script to source the wrapper automatically
+mkdir -p build/$APP/DEBIAN
+cat > build/$APP/DEBIAN/postinst <<'EOF'
+#!/bin/bash
+set -e
+SOURCE_LINE="source /usr/share/youjust/wrapper.sh"
+for profile in /etc/bash.bashrc /etc/zsh/zshrc; do
+    if [ -f "$profile" ] && ! grep -q "youjust/wrapper.sh" "$profile"; then
+        echo "$SOURCE_LINE" >> "$profile"
+    fi
+done
+EOF
+chmod 755 build/$APP/DEBIAN/postinst
 
 # ---------------------------
 # Build package

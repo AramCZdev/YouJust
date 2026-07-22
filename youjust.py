@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import shutil
 import sys
 import subprocess
 import shlex
@@ -76,17 +76,17 @@ elif cmd == "show current directory":
 # ---------------------------
 # FILES & FOLDERS
 # ---------------------------
-elif starts("create file"):
-    name = after("create file")
+elif starts("create a file"):
+    name = after("create a file")
     if not name:
-        print("Usage: youjust create file <name>")
+        print("Usage: youjust create a file <name>")
     else:
         run(["touch", name])
 
-elif starts("create folder"):
-    name = after("create folder")
+elif starts("create a folder"):
+    name = after("create a folder")
     if not name:
-        print("Usage: youjust create folder <name>")
+        print("Usage: youjust create a folder <name>")
     else:
         run(["mkdir", "-p", name])
 
@@ -98,16 +98,29 @@ elif starts("delete"):
         if input(f"Delete {target}? [y/N]: ").lower() == "y":
             run(["rm", "-rf", target])
 
-elif starts("show file"):
-    file = after("show file")
+elif starts("show a file"):
+    file = after("show a file")
     if not file:
-        print("Usage: youjust show file <file>")
+        print("Usage: youjust show a file <file>")
     else:
         run(["cat", file])
 
 elif cmd == "list files":
     run(["ls", "-lah"])
 
+elif starts("edit"):
+    file = after("edit")
+    if not file:
+        print("Usage: youjust edit <file>")
+    else:
+        if shutil.which("vim"):
+            run(["vim", file])
+        elif shutil.which("nano"):
+            run(["nano", file])
+        elif shutil.which("xdg-open"):
+            run(["xdg-open", file])
+        else:
+            print("No suitable text editor found.")
 
 # ---------------------------
 # COPY / MOVE / RENAME
@@ -135,14 +148,14 @@ elif starts("rename"):
 
 
 # ---------------------------
-# NAVIGATION (shell wrapper handles actual cd)
+# NAVIGATION
 # ---------------------------
 elif starts("go into"):
     path = after("go into")
     if not path:
         print("Usage: youjust go into <dir>")
     else:
-        print(f"cd {path}")
+        print(f"YOUJUST_CD:{shlex.quote(path)}")
 
 
 # ---------------------------
@@ -236,37 +249,37 @@ show current directory   Current path
 ----------------------------
 FILES
 ----------------------------
-create file <name>      Create file
-create folder <name>    Create folder
-show file <file>        Display file contents
-list files              List directory contents
-delete <target>        Delete file or folder
+create a file <name>     Create file
+create a folder <name>   Create folder
+show a file <file>       Display file contents
+list files               List directory contents
+delete <target>          Delete file or folder
 
 ----------------------------
 NAVIGATION
 ----------------------------
-go into <dir>          Change directory (handled via shell wrapper)
+go into <dir>            Change directory (not implemented right now)
 
 ----------------------------
 NETWORK
 ----------------------------
-ping <host>            Ping a host
+ping <host>              Ping a host
 
 ----------------------------
 PROCESS
 ----------------------------
-kill <pid>             Kill process
+kill <pid>               Kill process
 
 ----------------------------
 POWER
 ----------------------------
-reboot                 Restart system
-shutdown               Turn off system
+reboot                   Restart system
+shutdown                 Turn off system
 
 ----------------------------
 TERMINAL
 ----------------------------
-clear screen           Clear terminal
+clear screen             Clear terminal
 """)
 
 else:
