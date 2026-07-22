@@ -4,6 +4,7 @@ import sys
 import subprocess
 import shlex
 
+
 def run(cmd):
     print(f"> {' '.join(cmd)}")
     subprocess.run(cmd)
@@ -117,6 +118,8 @@ elif starts("edit"):
             run(["vim", file])
         elif shutil.which("nano"):
             run(["nano", file])
+        elif shutil.which("xed"):
+            run(["xed", file])
         elif shutil.which("xdg-open"):
             run(["xdg-open", file])
         else:

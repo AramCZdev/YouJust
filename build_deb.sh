@@ -66,10 +66,15 @@ complete -F _youjust_completion youjust
 EOF
 
 # ---------------------------
-# Wrapper script for changing directories
+# Wrapper script for changing directories and editing
 # ---------------------------
 cat > build/$APP/usr/share/youjust/wrapper.sh <<'EOF'
 youjust() {
+    if [[ "$1" == "edit" ]]; then
+        command youjust "$@"
+        return
+    fi
+
     local output
     output=$(command youjust "$@")
 
