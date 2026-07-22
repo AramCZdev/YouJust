@@ -31,7 +31,7 @@ sudo apt install python3
 
 ### Other Distros
 
-YouJust is not available for other ditributions since I would have to remake it for every one of them
+YouJust is not available for other ditributions
 
 ## Get Started
 
