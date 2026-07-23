@@ -3,6 +3,7 @@ description: Report problems installing YouJust
 title: "[Install Issue]: "
 labels: ["install issue"]
 
+body:
   - type: input
     id: os
     attributes:
