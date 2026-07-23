@@ -1,0 +1,69 @@
+name: Bug Report
+description: Report a bug in YouJust
+title: "[Bug]: "
+labels: ["bug"]
+
+  body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: "Example: v1.0.0"
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System Version
+      placeholder: "Example: Linux Mint 22.3, Ubuntu 26.04"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Describe what happened.
+      placeholder: Describe the bug here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Go to...
+        2. Do...
+        3. See error
+
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: The program should have...
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Videos
+      description: Drag and drop screenshots or videos here if available.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste crash logs or error messages here.
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I confirmed this issue happens on the latest version of YouJust.
+          required: true
+        - label: I checked existing issues and confirmed this bug has not already been reported.
+          required: true
+        - label: I confirmed this issue is related to YouJust and not a modified version.
+          required: true
