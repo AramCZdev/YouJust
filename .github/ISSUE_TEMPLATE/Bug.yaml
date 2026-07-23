@@ -33,7 +33,7 @@ body:
         1. Go to...
         2. Do...
         3. See error
-
+    validations:
       required: true
 
   - type: textarea
