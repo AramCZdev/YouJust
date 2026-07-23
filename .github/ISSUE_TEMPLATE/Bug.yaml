@@ -3,7 +3,7 @@ description: Report a bug in YouJust
 title: "[Bug]: "
 labels: ["bug"]
 
- body:
+body:
   - type: input
     id: version
     attributes:
